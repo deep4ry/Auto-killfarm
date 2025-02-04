@@ -1,0 +1,39 @@
+local player = game.Players.LocalPlayer
+
+local function checkForShove()
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        if otherPlayer ~= player and otherPlayer.Character then
+            local char = otherPlayer.Character
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            local root = char:FindFirstChild("HumanoidRootPart")
+            local myRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+
+            if humanoid and root and myRoot then
+                local distance = (myRoot.Position - root.Position).Magnitude
+                if distance < 50 then
+                    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+                        if track.Animation.AnimationId == "rbxassetid://10471336737" then
+                            player.Character.Humanoid.Health = 0
+                            return
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function preventAFK()
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+    while true do
+        wait(60)
+        humanoidRootPart.CFrame = humanoidRootPart.CFrame * CFrame.new(0, 0, 0.1)
+    end
+end
+
+spawn(preventAFK)
+while wait(0.1) do
+    checkForShove()
+end
